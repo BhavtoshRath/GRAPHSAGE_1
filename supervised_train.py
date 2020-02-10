@@ -18,6 +18,7 @@ os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"
 
 # Set random seed
 seed = 123
+seed = 123
 np.random.seed(seed)
 tf.set_random_seed(seed)
 
@@ -80,6 +81,9 @@ def train(train_data):
     G = train_data[0]
     features = train_data[1]
     labels = train_data[2]
+    train_nodes = train_data[3]
+    test_nodes = train_data[4]
+    val_nodes = train_data[5]
     num_classes = 2
 
     if not features is None:
@@ -90,6 +94,9 @@ def train(train_data):
     minibatch = NodeMinibatchIterator(G,
             placeholders,
             labels,
+            train_nodes,
+            test_nodes,
+            val_nodes,
             num_classes,
             batch_size=FLAGS.batch_size,
             max_degree=FLAGS.max_degree)

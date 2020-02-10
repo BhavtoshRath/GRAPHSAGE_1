@@ -20,7 +20,7 @@ class NodeMinibatchIterator(object):
     """
 
     def __init__(self, G,
-                 placeholders, label_map, num_classes,
+                 placeholders, label_map, train_nodes, test_nodes, val_nodes, num_classes,
                  batch_size=100, max_degree=25,
                  **kwargs):
 
@@ -37,13 +37,13 @@ class NodeMinibatchIterator(object):
         self.adj, self.deg = self.construct_adj()
         self.test_adj = self.construct_test_adj()
 
-        self.val_nodes = [n for n in self.G.nodes() if self.G.node[n]['val']]
-        self.test_nodes = [n for n in self.G.nodes() if self.G.node[n]['test']]
+        self.val_nodes = list(val_nodes)
+        self.test_nodes = list(test_nodes)
 
         self.no_train_nodes_set = set(self.val_nodes + self.test_nodes)
-        self.train_nodes = set(G.nodes()).difference(self.no_train_nodes_set)
+        self.train_nodes = train_nodes
         # don't train on nodes that only have edges to test set
-        self.train_nodes = [n for n in self.train_nodes if self.deg[id2idx[str(n)]] > 0]
+        self.train_nodes = [n for n in self.train_nodes if self.deg[n] > 0]
 
     def _make_label_vec(self, node):
         label = self.label_map[str(node)]
