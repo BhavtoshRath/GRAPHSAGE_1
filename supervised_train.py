@@ -8,10 +8,10 @@ import numpy as np
 import sklearn
 from sklearn import metrics
 
-# from graphsage.supervised_models import SupervisedGraphsage
-# from graphsage.models import SAGEInfo
+from supervised_models import SupervisedGraphsage
+from models import SAGEInfo
 from minibatch import NodeMinibatchIterator
-# from graphsage.neigh_samplers import UniformNeighborSampler
+from neigh_samplers import UniformNeighborSampler
 from utils import load_data
 
 os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"
@@ -103,6 +103,30 @@ def train(train_data):
     adj_info_ph = tf.placeholder(tf.int32, shape=minibatch.adj.shape)
     adj_info = tf.Variable(adj_info_ph, trainable=False, name="adj_info")
 
+    if FLAGS.model == 'graphsage_mean':
+        # Create model
+        sampler = UniformNeighborSampler(adj_info)
+        if FLAGS.samples_3 != 0:
+            layer_infos = [SAGEInfo("node", sampler, FLAGS.samples_1, FLAGS.dim_1),
+                           SAGEInfo("node", sampler, FLAGS.samples_2, FLAGS.dim_2),
+                           SAGEInfo("node", sampler, FLAGS.samples_3, FLAGS.dim_2)]
+        elif FLAGS.samples_2 != 0:
+            layer_infos = [SAGEInfo("node", sampler, FLAGS.samples_1, FLAGS.dim_1),
+                           SAGEInfo("node", sampler, FLAGS.samples_2, FLAGS.dim_2)]
+        else:
+            layer_infos = [SAGEInfo("node", sampler, FLAGS.samples_1, FLAGS.dim_1)]
+
+    model = SupervisedGraphsage(num_classes, placeholders,
+                                features,
+                                adj_info,
+                                minibatch.deg,
+                                layer_infos,
+                                model_size=FLAGS.model_size,
+                                sigmoid_loss=FLAGS.sigmoid,
+                                identity_dim=FLAGS.identity_dim,
+                                logging=True)
+
+    print('x')
 
 
 def main(argv=None):
