@@ -46,12 +46,12 @@ class NodeMinibatchIterator(object):
         self.train_nodes = [n for n in self.train_nodes if self.deg[n] > 0]
 
     def _make_label_vec(self, node):
-        label = self.label_map[str(node)]
+        label = self.label_map[node]
         if isinstance(label, list):
             label_vec = np.array(label)
         else:
             label_vec = np.zeros((self.num_classes))
-            class_ind = self.label_map[str(node)]
+            class_ind = self.label_map[node]
             label_vec[class_ind] = 1
         return label_vec
 
@@ -90,16 +90,15 @@ class NodeMinibatchIterator(object):
         return self.batch_num * self.batch_size >= len(self.train_nodes)
 
     def batch_feed_dict(self, batch_nodes, val=False):
-        batch1id = batch_nodes
-        batch1 = [self.id2idx[str(n)] for n in batch1id]
+        batch1 = batch_nodes
 
-        labels = np.vstack([self._make_label_vec(node) for node in batch1id])
+        labels = np.vstack([self._make_label_vec(node) for node in batch1])
         feed_dict = dict()
         feed_dict.update({self.placeholders['batch_size']: len(batch1)})
         feed_dict.update({self.placeholders['batch']: batch1})
         feed_dict.update({self.placeholders['labels']: labels})
 
-        return feed_dict, labels
+        return feed_dict, labels, batch1
 
     def node_val_feed_dict(self, size=None, test=False):
         if test:
@@ -110,7 +109,7 @@ class NodeMinibatchIterator(object):
             val_nodes = np.random.choice(val_nodes, size, replace=True)
         # add a dummy neighbor
         ret_val = self.batch_feed_dict(val_nodes)
-        return ret_val[0], ret_val[1]
+        return ret_val[0], ret_val[1], ret_val[2]
 
     def incremental_node_val_feed_dict(self, size, iter_num, test=False):
         if test:

@@ -1,0 +1,1 @@
+loss=1.10178 accuracy=0.66667 precision=0.66667 recall=1.00000 f1_score=0.80000

@@ -1,4 +1,5 @@
 import tensorflow as tf
+# tf.enable_eager_execution()
 
 import models
 import layers
@@ -76,8 +77,10 @@ class SupervisedGraphsage(models.SampleAndAggregate):
 
 
     def build(self):
+        '''start SAMPLE'''
         samples1, support_sizes1 = self.sample(self.inputs1, self.layer_infos)
         num_samples = [layer_info.num_samples for layer_info in self.layer_infos]
+        '''start AGGREGATE'''
         self.outputs1, self.aggregators = self.aggregate(samples1, [self.features], self.dims, num_samples,
                 support_sizes1, concat=self.concat, model_size=self.model_size)
         dim_mult = 2 if self.concat else 1
@@ -87,7 +90,7 @@ class SupervisedGraphsage(models.SampleAndAggregate):
         dim_mult = 2 if self.concat else 1
         self.node_pred = layers.Dense(dim_mult*self.dims[-1], self.num_classes, 
                 dropout=self.placeholders['dropout'],
-                act=lambda x : x)
+                act=lambda x: x)
         # TF graph management
         self.node_preds = self.node_pred(self.outputs1)
 

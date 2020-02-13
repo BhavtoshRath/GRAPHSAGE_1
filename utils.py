@@ -8,8 +8,7 @@ import os
 import re
 
 import networkx as nx
-from collections import defaultdict
-# from networkx.readwrite import json_graph
+
 version_info = list(map(int, nx.__version__.split('.')))
 major = version_info[0]
 minor = version_info[1]
@@ -22,7 +21,7 @@ N_WALKS=50
 def load_data(normalize=True):
     # Read netwrok file
     network_file = 'data/network_sample.txt'
-    G = nx.Graph()
+    G = nx.DiGraph()
     with open(network_file) as infile:
         for line in infile:
             l_spl = re.split(',', line.rstrip())

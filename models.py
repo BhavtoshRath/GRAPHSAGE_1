@@ -4,10 +4,10 @@ import tensorflow as tf
 import math
 
 import layers
-# import graphsage.metrics as metrics
+import metrics as metrics
 
-# from .prediction import BipartiteEdgePredLayer
-# from .aggregators import MeanAggregator, MaxPoolingAggregator, MeanPoolingAggregator, SeqAggregator, GCNAggregator
+from prediction import BipartiteEdgePredLayer
+from aggregators import MeanAggregator, MaxPoolingAggregator, MeanPoolingAggregator, SeqAggregator, GCNAggregator
 
 flags = tf.app.flags
 FLAGS = flags.FLAGS
@@ -269,7 +269,7 @@ class SampleAndAggregate(GeneralizedModel):
             t = len(layer_infos) - k - 1
             support_size *= layer_infos[t].num_samples
             sampler = layer_infos[t].neigh_sampler
-            node = sampler((samples[k], layer_infos[t].num_samples))
+            node = sampler((samples[k], layer_infos[t].num_samples)) # *
             samples.append(tf.reshape(node, [support_size * batch_size,]))
             support_sizes.append(support_size)
         return samples, support_sizes
